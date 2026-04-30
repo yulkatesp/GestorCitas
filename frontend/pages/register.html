@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro — MediCita</title>
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="nav-logo"><span class="cruz">✚</span> MediCita</a>
+  </nav>
+  <div class="auth-wrapper">
+    <div class="auth-left">
+      <h2>Únete a MediCita</h2>
+      <p>Crea tu cuenta gratis y accede al sistema de citas médicas más fácil de usar.</p>
+      <div class="auth-steps">
+        <div class="auth-step"><div class="step-num">1</div><span>Crea tu cuenta con tu email</span></div>
+        <div class="auth-step"><div class="step-num">2</div><span>Elige médico, fecha y hora</span></div>
+        <div class="auth-step"><div class="step-num">3</div><span>¡Listo! Tu cita está agendada</span></div>
+      </div>
+    </div>
+    <div class="auth-right">
+      <div class="auth-box fade-in">
+        <h1>Crear cuenta</h1>
+        <p class="subtitle">Solo toma 30 segundos</p>
+        <div id="alerta" class="alert"></div>
+        <div class="form-group">
+          <label for="nombre">Nombre completo</label>
+          <input type="text" id="nombre" placeholder="María García">
+        </div>
+        <div class="form-group">
+          <label for="email">Correo electrónico</label>
+          <input type="email" id="email" placeholder="tu@correo.com">
+        </div>
+        <div class="form-group">
+          <label for="password">Contraseña <span style="font-weight:400;text-transform:none">(mín. 6 caracteres)</span></label>
+          <input type="password" id="password" placeholder="••••••••">
+        </div>
+        <button class="btn btn-primary btn-full" id="btnRegister">Crear cuenta gratis</button>
+        <div class="auth-footer">¿Ya tienes cuenta? <a href="login.html">Inicia sesión</a></div>
+      </div>
+    </div>
+  </div>
+  <script>
+    if (localStorage.getItem('token')) window.location.href = 'citas.html';
+    function mostrarAlerta(msg, tipo='error') {
+      const a = document.getElementById('alerta');
+      a.textContent = msg; a.className = `alert alert-${tipo} show`;
+    }
+    document.getElementById('btnRegister').addEventListener('click', async () => {
+      const nombre = document.getElementById('nombre').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const btn = document.getElementById('btnRegister');
+      if (!nombre||!email||!password) return mostrarAlerta('Completa todos los campos');
+      if (password.length<6) return mostrarAlerta('La contraseña debe tener al menos 6 caracteres');
+      btn.innerHTML='<span class="loader"></span> Creando cuenta...'; btn.disabled=true;
+      try {
+        const res = await fetch('/api/users/register', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({nombre,email,password}) });
+        const data = await res.json();
+        if (!res.ok) { mostrarAlerta(data.error||'Error al registrarse'); btn.innerHTML='Crear cuenta gratis'; btn.disabled=false; return; }
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('usuario', JSON.stringify(data.usuario));
+        mostrarAlerta('¡Cuenta creada! Redirigiendo...', 'success');
+        setTimeout(() => window.location.href='citas.html', 900);
+      } catch(e) { mostrarAlerta('Error de conexión'); btn.innerHTML='Crear cuenta gratis'; btn.disabled=false; }
+    });
+  </script>
+</body>
+</html>
