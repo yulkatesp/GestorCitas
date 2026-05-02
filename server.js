@@ -14,6 +14,13 @@ app.use(express.json());
 // Servir frontend estático
 app.use(express.static(path.join(__dirname, 'frontend')));
 
+const frontendPath = path.join(__dirname, 'frontend');
+app.use(express.static(frontendPath));
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(frontendPath, 'pages', 'index.html'));
+});
+
 // Rutas API
 app.use('/api/users',  require('./routes/users'));
 app.use('/api/citas',  require('./routes/citas'));
@@ -21,7 +28,7 @@ app.use('/api/admin',  require('./routes/admin'));
 
 // Página principal
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/pages/index.html'));
+  res.sendFile(path.join(__dirname, 'frontend/pages/index.html'));
 });
 
 // Manejo de errores global
