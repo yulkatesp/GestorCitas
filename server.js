@@ -28,18 +28,7 @@ app.get('/citas',    (req, res) => res.sendFile(path.resolve('frontend/pages/cit
 app.get('/admin',    (req, res) => res.sendFile(path.resolve('frontend/pages/admin.html')));
 app.get('/',         (req, res) => res.sendFile(path.resolve('frontend/pages/index.html')));
 
-app.get('/setup-admin', (req, res) => {
-  const bcrypt = require('bcryptjs');
-  const db = require('./database');
-  const hash = bcrypt.hashSync('admin123', 10);
-  db.usuarios.insert(
-    { nombre: 'Administrador', email: 'admin@clinica.com', password: hash, rol: 'admin', creado_en: new Date() },
-    (err, doc) => {
-      if (err) return res.json({ error: 'Error: ' + err });
-      res.json({ ok: true, mensaje: 'Admin creado ✅' });
-    }
-  );
-});
+
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
