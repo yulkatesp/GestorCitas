@@ -21,6 +21,13 @@ app.get('/', (req, res) => {
   res.sendFile(path.resolve('frontend/pages/index.html'));
 });
 
+// Redirigir rutas limpias a las páginas
+app.get('/login',    (req, res) => res.sendFile(path.resolve('frontend/pages/login.html')));
+app.get('/register', (req, res) => res.sendFile(path.resolve('frontend/pages/register.html')));
+app.get('/citas',    (req, res) => res.sendFile(path.resolve('frontend/pages/citas.html')));
+app.get('/admin',    (req, res) => res.sendFile(path.resolve('frontend/pages/admin.html')));
+app.get('/',         (req, res) => res.sendFile(path.resolve('frontend/pages/index.html')));
+
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: 'Error interno del servidor' });
