@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Iniciar sesión — MediCita</title>
-  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
   <nav>
-    <a href="index.html" class="nav-logo"><span class="cruz">✚</span> MediCita</a>
+    <a href="/" class="nav-logo"><span class="cruz">✚</span> MediCita</a>
   </nav>
   <div class="auth-wrapper">
     <div class="auth-left">
@@ -33,14 +33,14 @@
           <input type="password" id="password" placeholder="••••••••">
         </div>
         <button class="btn btn-primary btn-full" id="btnLogin">Iniciar sesión</button>
-        <div class="auth-footer">¿No tienes cuenta? <a href="register.html">Regístrate gratis</a></div>
+        <div class="auth-footer">¿No tienes cuenta? <a href="/register">Regístrate gratis</a></div>
       </div>
     </div>
   </div>
   <script>
     if (localStorage.getItem('token')) {
       const rol = JSON.parse(localStorage.getItem('usuario')||'{}').rol;
-      window.location.href = rol === 'admin' ? 'admin.html' : 'citas.html';
+      window.location.href = rol === 'admin' ? '/admin' : '/citas';
     }
     function mostrarAlerta(msg, tipo='error') {
       const a = document.getElementById('alerta');
@@ -59,7 +59,7 @@
         localStorage.setItem('token', data.token);
         localStorage.setItem('usuario', JSON.stringify(data.usuario));
         mostrarAlerta('¡Bienvenido! Redirigiendo...', 'success');
-        setTimeout(() => window.location.href = data.usuario.rol==='admin' ? 'admin.html' : 'citas.html', 800);
+        setTimeout(() => window.location.href = data.usuario.rol==='admin' ? '/admin' : '/citas', 800);
       } catch(e) { mostrarAlerta('Error de conexión'); btn.innerHTML='Iniciar sesión'; btn.disabled=false; }
     });
     document.getElementById('password').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('btnLogin').click(); });

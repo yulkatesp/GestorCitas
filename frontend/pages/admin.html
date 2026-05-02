@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Panel Admin — MediCita</title>
-  <link rel="stylesheet" href="../css/styles.css">
+   <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
   <div class="blob blob-1"></div>
@@ -94,9 +94,9 @@
   <script>
     const token = localStorage.getItem('token');
     const usuario = JSON.parse(localStorage.getItem('usuario')||'null');
-    if (!token||!usuario||usuario.rol!=='admin') window.location.href='login.html';
+    if (!token||!usuario||usuario.rol!=='admin') window.location.href = '/login';
 
-    document.getElementById('btnLogout').addEventListener('click', () => { localStorage.clear(); window.location.href='login.html'; });
+    document.getElementById('btnLogout').addEventListener('click', () => { localStorage.clear(); window.location.href = '/login'; });
 
     const headers = {'Content-Type':'application/json','Authorization':`Bearer ${token}`};
     let todasCitasAdmin = [];

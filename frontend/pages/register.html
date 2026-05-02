@@ -42,7 +42,7 @@
     </div>
   </div>
   <script>
-    if (localStorage.getItem('token')) window.location.href = 'citas.html';
+    if (localStorage.getItem('token')) window.location.href = '/citas';
     function mostrarAlerta(msg, tipo='error') {
       const a = document.getElementById('alerta');
       a.textContent = msg; a.className = `alert alert-${tipo} show`;
@@ -62,7 +62,7 @@
         localStorage.setItem('token', data.token);
         localStorage.setItem('usuario', JSON.stringify(data.usuario));
         mostrarAlerta('¡Cuenta creada! Redirigiendo...', 'success');
-        setTimeout(() => window.location.href='citas.html', 900);
+        setTimeout(() => window.location.href = '/citas', 900);
       } catch(e) { mostrarAlerta('Error de conexión'); btn.innerHTML='Crear cuenta gratis'; btn.disabled=false; }
     });
   </script>

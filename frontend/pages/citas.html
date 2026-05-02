@@ -96,11 +96,11 @@
   <script>
     const token = localStorage.getItem('token');
     const usuario = JSON.parse(localStorage.getItem('usuario')||'null');
-    if (!token||!usuario) window.location.href='login.html';
+    if (!token||!usuario) window.location.href = '/login';
 
     document.getElementById('navNombre').textContent = `Hola, ${usuario.nombre.split(' ')[0]} 🤍`;
     document.getElementById('subtitulo').textContent  = `Bienvenida, ${usuario.nombre}`;
-    document.getElementById('btnLogout').addEventListener('click', () => { localStorage.clear(); window.location.href='login.html'; });
+    document.getElementById('btnLogout').addEventListener('click', () => { localStorage.clear(); window.location.href = '/login'; });
 
     const headers = {'Content-Type':'application/json','Authorization':`Bearer ${token}`};
 
