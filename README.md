@@ -5,7 +5,7 @@ Aplicación web fullstack para agendar y gestionar citas médicas en una clínic
 ## Despliegue (Railway)
 
 <!-- Sube tu video a YouTube y reemplaza VIDEO_ID con el id del video -->
-[![Despliegue](img/Portada.png)](https://gestorcitas-production.up.railway.app/)
+[![Despliegue](frontend/img/Portada.png)](https://gestorcitas-production.up.railway.app/)
 
 ## Stack tecnológico
 
