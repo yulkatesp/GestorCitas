@@ -1,6 +1,17 @@
+<div align="center">
+
 # Sistema de Gestión de Citas Médicas
 
-Aplicación web fullstack para agendar y gestionar citas médicas en una clínica.
+**Aplicación web fullstack para agendar y gestionar citas médicas en una clínica**
+
+![Node.js](https://img.shields.io/badge/NODE.JS-18+-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
+![Express](https://img.shields.io/badge/EXPRESS-4.x-000000?style=for-the-badge&logo=express&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JAVASCRIPT-ES6+-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+![NeDB](https://img.shields.io/badge/NEDB-4.x-4A7C6F?style=for-the-badge&logoColor=white)
+![Railway](https://img.shields.io/badge/RAILWAY-DEPLOY-0B0D0E?style=for-the-badge&logo=railway&logoColor=white)
+![JWT](https://img.shields.io/badge/JWT-AUTH-d63aff?style=for-the-badge&logo=jsonwebtokens&logoColor=white)
+
+</div>
 
 ## Despliegue (Railway)
 
