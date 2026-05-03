@@ -15,6 +15,23 @@ const db = {
   medicos:  new Datastore({ filename: dbPath('medicos'),  autoload: true }),
 };
 
+// Crear admin automáticamente si no existe
+const bcrypt = require('bcryptjs');
+setTimeout(() => {
+  db.usuarios.findOne({ email: 'admin@clinica.com' }, (err, existe) => {
+    if (!existe) {
+      const hash = bcrypt.hashSync('admin123', 10);
+      db.usuarios.insert({
+        nombre: 'Administrador',
+        email: 'admin@clinica.com',
+        password: hash,
+        rol: 'admin',
+        creado_en: new Date()
+      }, () => console.log('✅ Admin creado automáticamente'));
+    }
+  });
+}, 1000);
+
 // Índices para búsquedas rápidas
 db.usuarios.ensureIndex({ fieldName: 'email', unique: true });
 
