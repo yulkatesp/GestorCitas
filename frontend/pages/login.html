@@ -47,10 +47,7 @@
     </div>
   </div>
   <script>
-    if (localStorage.getItem('token')) {
-      const rol = JSON.parse(localStorage.getItem('usuario') || '{}').rol;
-      window.location.href = rol === 'admin' ? '/admin' : '/citas';
-    }
+    localStorage.clear();
     function mostrarAlerta(msg, tipo = 'error') {
       const a = document.getElementById('alerta');
       a.textContent = msg; a.className = `alert alert-${tipo} show`;
