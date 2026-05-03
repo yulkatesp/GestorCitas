@@ -20,7 +20,7 @@ const bcrypt = require('bcryptjs');
 setTimeout(() => {
   db.usuarios.findOne({ email: 'admin@clinica.com' }, (err, existe) => {
     if (!existe) {
-      const hash = bcrypt.hashSync('admin123', 10);
+      const hash = bcrypt.hashSync('Rocky2603**.', 10);
       db.usuarios.insert({
         nombre: 'Administrador',
         email: 'admin@clinica.com',
