@@ -226,7 +226,7 @@
             <span class="cita-fecha-tag">${formatFecha(c.fecha)}</span>
             <span class="cita-hora">${c.hora}</span>
           </div>
-          <img src="${c.foto_medico || 'https://raw.githubusercontent.com/yulkatesp/GestorCitas/main/frontend/img/DOC.png'}" alt="Dr. ${c.medico}" class="cita-avatar">
+          <img style="width: 20px;" src="${c.foto_medico || 'https://raw.githubusercontent.com/yulkatesp/GestorCitas/main/frontend/img/DOC.png'}" alt="Dr. ${c.medico}" class="cita-avatar">
           <div class="cita-especialidad">${c.especialidad}</div>
           ${c.motivo ? `<img src="${c.foto_motivo || 'https://raw.githubusercontent.com/yulkatesp/GestorCitas/main/frontend/img/CIT.png'}" alt="Motivo" class="cita-motivo">` : ''}
           <div class="cita-footer">
