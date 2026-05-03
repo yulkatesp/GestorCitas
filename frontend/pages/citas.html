@@ -1,13 +1,10 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Panel Admin — MediCita</title>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mis Citas — MediCita</title>
   <link rel="stylesheet" href="/css/styles.css">
 </head>
-
 <body>
   <div class="blob blob-1"></div>
   <div class="blob blob-2"></div>
@@ -15,8 +12,7 @@
   <nav>
     <a href="/" class="nav-logo"><span class="cruz">✚</span> MediCita</a>
     <div class="nav-links">
-      <span
-        style="font-size:0.78rem;background:var(--menta);color:var(--verde-dark);padding:0.3rem 1rem;border-radius:100px;font-weight:700">Admin</span>
+      <span id="navNombre" style="font-size:0.88rem;color:var(--texto-mid);font-weight:600"></span>
       <button class="btn btn-outline btn-sm" id="btnLogout">Salir</button>
     </div>
   </nav>
@@ -24,48 +20,24 @@
   <div class="dashboard">
     <div class="dashboard-header">
       <div>
-        <h1>Panel Administrativo</h1>
-        <p>Gestión de citas y médicos de la clínica</p>
+        <h1>Mis citas</h1>
+        <p id="subtitulo">Gestiona y agenda tus consultas médicas</p>
       </div>
-      <button class="btn btn-dorado" id="btnNuevoMedico">+ Nuevo médico</button>
+      <button class="btn btn-primary" id="btnNuevaCita">+ Nueva cita</button>
     </div>
 
-    <div class="stats-row" id="statsRow">
-      <div class="stat-card">
-        <div class="stat-icon">📋</div>
-        <div class="stat-num" id="statTotal">—</div>
-        <div class="stat-label">Total citas</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">⏳</div>
-        <div class="stat-num" id="statPendientes">—</div>
-        <div class="stat-label">Pendientes</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">👥</div>
-        <div class="stat-num" id="statUsuarios">—</div>
-        <div class="stat-label">Pacientes</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">👨‍⚕️</div>
-        <div class="stat-num" id="statMedicos">—</div>
-        <div class="stat-label">Médicos</div>
-      </div>
-    </div>
-
-    <!-- Layout: tabla + calendario -->
     <div class="citas-layout">
-      <div class="table-wrap">
-        <div class="table-header">
-          <h2>Todas las citas</h2>
-          <button class="btn btn-outline btn-sm" onclick="cargarCitas()">↻ Actualizar</button>
-        </div>
-        <div id="tablaCitas">
-          <div style="text-align:center;padding:2.5rem"><span class="loader loader-dark"></span></div>
+      <!-- Columna izquierda: citas -->
+      <div>
+        <div id="contenidoCitas">
+          <div style="text-align:center;padding:3rem">
+            <span class="loader loader-dark"></span>
+            <p style="margin-top:1rem;color:var(--texto-mid)">Cargando tus citas...</p>
+          </div>
         </div>
       </div>
 
-      <!-- Calendario admin -->
+      <!-- Columna derecha: calendario -->
       <div>
         <div class="calendario-wrap fade-in">
           <div class="cal-header">
@@ -79,182 +51,272 @@
           </div>
           <div class="cal-dias" id="calDias"></div>
           <div class="cal-leyenda">
-            <div class="cal-leyenda-item">
-              <div class="cal-dot" style="background:var(--dorado)"></div>Con citas
-            </div>
-            <div class="cal-leyenda-item">
-              <div class="cal-dot" style="background:var(--dorado-light)"></div>Hoy
-            </div>
+            <div class="cal-leyenda-item"><div class="cal-dot" style="background:var(--dorado)"></div>Con cita</div>
+            <div class="cal-leyenda-item"><div class="cal-dot" style="background:var(--dorado-light)"></div>Hoy</div>
+            <div class="cal-leyenda-item"><div class="cal-dot" style="background:var(--verde)"></div>Seleccionado</div>
           </div>
           <div class="proximas-wrap">
-            <div class="proximas-titulo">Citas de hoy</div>
-            <div id="citasHoy"></div>
+            <div class="proximas-titulo">Próximas citas</div>
+            <div id="proximasList"></div>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Modal nuevo médico -->
-  <div class="modal-overlay" id="modalMedico">
+  <!-- Modal nueva cita -->
+  <div class="modal-overlay" id="modalOverlay">
     <div class="modal">
       <div class="modal-header">
-        <h2>Agregar médico</h2>
-        <button class="modal-close" onclick="document.getElementById('modalMedico').classList.remove('open')">✕</button>
+        <h2>Nueva cita</h2>
+        <button class="modal-close" id="modalClose">✕</button>
       </div>
-      <div id="alertaMedico" class="alert"></div>
+      <div id="alertaModal" class="alert"></div>
+
       <div class="form-group">
-        <label for="nombreMedico">Nombre completo</label>
-        <input type="text" id="nombreMedico" placeholder="Dr. Juan Pérez">
+        <label>Médico / Especialidad</label>
+        <div id="medicosGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-top:0.4rem"></div>
+      </div>
+      <div class="form-group" style="margin-top:1rem">
+        <label for="selectFecha">Fecha</label>
+        <input type="date" id="selectFecha" style="border-radius:var(--radio)">
+      </div>
+      <div class="form-group" id="grupoHorarios" style="display:none">
+        <label>Horario disponible</label>
+        <div class="horarios-grid" id="horariosGrid"></div>
       </div>
       <div class="form-group">
-        <label for="especialidad">Especialidad</label>
-        <input type="text" id="especialidad" placeholder="Ej: Cardiología">
+        <label for="motivo">Motivo de consulta <span style="font-weight:400;text-transform:none;font-size:0.78rem">(opcional)</span></label>
+        <input type="text" id="motivo" placeholder="Ej: Dolor de cabeza, revisión general...">
       </div>
-      <button class="btn btn-primary btn-full" id="btnGuardarMedico">Guardar médico</button>
+      <button class="btn btn-primary btn-full" id="btnConfirmar">Confirmar cita</button>
     </div>
   </div>
 
   <script>
     const token = localStorage.getItem('token');
-    const usuario = JSON.parse(localStorage.getItem('usuario') || 'null');
-    if (!token || !usuario) {
-      window.location.replace('/login');  // replace en vez de href
-    }
+    const usuario = JSON.parse(localStorage.getItem('usuario')||'null');
+    if (!token||!usuario) window.location.href='/login';
 
-    document.getElementById('btnLogout').addEventListener('click', () => { localStorage.clear(); window.location.href = '/login'; });
+    document.getElementById('navNombre').textContent = `Hola, ${usuario.nombre.split(' ')[0]} 👋`;
+    document.getElementById('subtitulo').textContent  = `Bienvenida, ${usuario.nombre}`;
+    document.getElementById('btnLogout').addEventListener('click', () => { localStorage.clear(); window.location.href='/login'; });
 
-    const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
-    let todasCitasAdmin = [];
+    const headers = {'Content-Type':'application/json','Authorization':`Bearer ${token}`};
+
+    // ── CALENDARIO ──
     let calFecha = new Date();
+    let todasCitas = [];
 
-    function renderCalendarioAdmin() {
+    function renderCalendario() {
       const año = calFecha.getFullYear(), mes = calFecha.getMonth();
-      const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+      const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
       document.getElementById('calTitulo').textContent = `${meses[mes]} ${año}`;
+
       const hoy = new Date();
       const primerDia = new Date(año, mes, 1).getDay();
-      const diasEnMes = new Date(año, mes + 1, 0).getDate();
-      const fechasCitas = todasCitasAdmin.filter(c => c.estado !== 'cancelada').map(c => c.fecha);
+      const diasEnMes = new Date(año, mes+1, 0).getDate();
+
+      const fechasCitas = todasCitas
+        .filter(c => c.estado !== 'cancelada')
+        .map(c => c.fecha);
+
       let html = '';
-      for (let i = 0; i < primerDia; i++) html += '<button class="cal-dia vacio"></button>';
-      for (let d = 1; d <= diasEnMes; d++) {
-        const fechaStr = `${año}-${String(mes + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-        const esHoy = hoy.getFullYear() === año && hoy.getMonth() === mes && hoy.getDate() === d;
+      for (let i=0; i<primerDia; i++) html += '<button class="cal-dia vacio"></button>';
+      for (let d=1; d<=diasEnMes; d++) {
+        const fechaStr = `${año}-${String(mes+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        const esHoy = hoy.getFullYear()===año && hoy.getMonth()===mes && hoy.getDate()===d;
         const tieneCita = fechasCitas.includes(fechaStr);
+        const pasado = new Date(año,mes,d) < new Date(hoy.getFullYear(),hoy.getMonth(),hoy.getDate());
         let cls = 'cal-dia';
         if (esHoy) cls += ' hoy';
         if (tieneCita) cls += ' tiene-cita';
+        if (pasado && !esHoy) cls += ' pasado';
         html += `<button class="${cls}" data-fecha="${fechaStr}">${d}</button>`;
       }
       document.getElementById('calDias').innerHTML = html;
-      document.querySelectorAll('.cal-dia:not(.vacio)').forEach(btn => {
+
+      document.querySelectorAll('.cal-dia:not(.vacio):not(.pasado)').forEach(btn => {
         btn.addEventListener('click', () => {
           document.querySelectorAll('.cal-dia').forEach(b => b.classList.remove('seleccionado'));
           btn.classList.add('seleccionado');
-          renderCitasAdmin(todasCitasAdmin.filter(c => c.fecha === btn.dataset.fecha));
+          filtrarCitasPorFecha(btn.dataset.fecha);
         });
       });
     }
 
-    function renderCitasHoy() {
-      const hoy = new Date().toISOString().split('T')[0];
-      const citasHoy = todasCitasAdmin.filter(c => c.fecha === hoy && c.estado !== 'cancelada');
-      const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-      const wrap = document.getElementById('citasHoy');
-      if (!citasHoy.length) { wrap.innerHTML = '<p style="font-size:0.82rem;color:var(--texto-light)">Sin citas hoy</p>'; return; }
-      wrap.innerHTML = citasHoy.map(c => {
-        const [y, m, d] = c.fecha.split('-');
+    function filtrarCitasPorFecha(fecha) {
+      const citasDia = todasCitas.filter(c => c.fecha === fecha);
+      if (citasDia.length) renderCitas(citasDia);
+      else renderCitas(todasCitas);
+    }
+
+    document.getElementById('calPrev').addEventListener('click', () => { calFecha.setMonth(calFecha.getMonth()-1); renderCalendario(); });
+    document.getElementById('calNext').addEventListener('click', () => { calFecha.setMonth(calFecha.getMonth()+1); renderCalendario(); });
+
+    function renderProximas(citas) {
+      const proximas = citas
+        .filter(c => c.estado === 'pendiente' && c.fecha >= new Date().toISOString().split('T')[0])
+        .sort((a,b) => a.fecha.localeCompare(b.fecha))
+        .slice(0, 3);
+      const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+      const wrap = document.getElementById('proximasList');
+      if (!proximas.length) { wrap.innerHTML = '<p style="font-size:0.82rem;color:var(--texto-light)">Sin citas próximas</p>'; return; }
+      wrap.innerHTML = proximas.map(c => {
+        const [y,m,d] = c.fecha.split('-');
         return `<div class="proxima-item">
           <div class="proxima-fecha-box">
             <div class="proxima-dia">${d}</div>
-            <div class="proxima-mes">${meses[+m - 1]}</div>
+            <div class="proxima-mes">${meses[+m-1]}</div>
           </div>
           <div class="proxima-info">
-            <div class="proxima-doctor">${c.paciente}</div>
-            <div class="proxima-hora">${c.hora} — ${c.medico}</div>
+            <div class="proxima-doctor">${c.medico}</div>
+            <div class="proxima-hora">${c.hora} — ${c.especialidad}</div>
           </div>
         </div>`;
       }).join('');
     }
 
-    document.getElementById('calPrev').addEventListener('click', () => { calFecha.setMonth(calFecha.getMonth() - 1); renderCalendarioAdmin(); });
-    document.getElementById('calNext').addEventListener('click', () => { calFecha.setMonth(calFecha.getMonth() + 1); renderCalendarioAdmin(); });
-
-    async function cargarEstadisticas() {
-      const res = await fetch('/api/admin/estadisticas', { headers });
-      const data = await res.json();
-      document.getElementById('statTotal').textContent = data.totalCitas;
-      document.getElementById('statPendientes').textContent = data.citasPendientes;
-      document.getElementById('statUsuarios').textContent = data.totalUsuarios;
-      document.getElementById('statMedicos').textContent = data.totalMedicos;
-    }
-
+    // ── CARGAR CITAS ──
     async function cargarCitas() {
-      const wrap = document.getElementById('tablaCitas');
-      wrap.innerHTML = '<div style="text-align:center;padding:2rem"><span class="loader loader-dark"></span></div>';
       try {
-        const res = await fetch('/api/admin/citas', { headers });
-        const citas = await res.json();
-        todasCitasAdmin = citas;
-        renderCitasAdmin(citas);
-        renderCalendarioAdmin();
-        renderCitasHoy();
-      } catch (e) {
-        wrap.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><h3>Error al cargar</h3></div>`;
+        const res = await fetch('/api/citas', {headers});
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        todasCitas = data;
+        renderCitas(data);
+        renderCalendario();
+        renderProximas(data);
+      } catch(e) {
+        document.getElementById('contenidoCitas').innerHTML =
+          `<div class="empty-state"><div class="empty-icon">⚠️</div><h3>Error al cargar</h3><p>${e.message}</p></div>`;
       }
     }
 
     function formatFecha(f) {
-      if (!f) return '—';
-      const [y, m, d] = f.split('-');
-      const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-      return `${d} ${meses[+m - 1]} ${y}`;
+      const [y,m,d] = f.split('-');
+      const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+      return `${d} ${meses[+m-1]} ${y}`;
     }
 
-    function renderCitasAdmin(citas) {
-      const wrap = document.getElementById('tablaCitas');
-      if (!citas.length) { wrap.innerHTML = '<div class="empty-state"><div class="empty-icon">🌿</div><h3>Sin citas</h3></div>'; return; }
-      wrap.innerHTML = `<table>
-        <thead><tr>
-          <th>Paciente</th><th>Médico</th><th>Especialidad</th>
-          <th>Fecha</th><th>Hora</th><th>Estado</th><th>Motivo</th>
-        </tr></thead>
-        <tbody>${citas.map(c => `<tr>
-          <td><strong>${c.paciente}</strong><br><span style="font-size:0.78rem;color:var(--texto-light)">${c.paciente_email}</span></td>
-          <td>${c.medico}</td>
-          <td style="color:var(--texto-mid);font-size:0.85rem">${c.especialidad}</td>
-          <td>${formatFecha(c.fecha)}</td>
-          <td><strong>${c.hora}</strong></td>
-          <td><span class="badge badge-${c.estado}">${c.estado}</span></td>
-          <td style="color:var(--texto-mid);font-size:0.85rem">${c.motivo || '—'}</td>
-        </tr>`).join('')}</tbody>
-      </table>`;
+    function renderCitas(citas) {
+      const wrap = document.getElementById('contenidoCitas');
+      if (!citas.length) {
+        wrap.innerHTML = `<div class="empty-state">
+          <div class="empty-icon">🌿</div>
+          <h3>Sin citas agendadas</h3>
+          <p>¡Agenda tu primera consulta médica!</p>
+          <button class="btn btn-primary" style="margin-top:1rem" onclick="document.getElementById('btnNuevaCita').click()">+ Nueva cita</button>
+        </div>`;
+        return;
+      }
+      wrap.innerHTML = `<div class="citas-grid">${citas.map(c => `
+        <div class="cita-card ${c.estado==='cancelada'?'cancelada':''}">
+          <div class="cita-top">
+            <span class="cita-fecha-tag">${formatFecha(c.fecha)}</span>
+            <span class="cita-hora">${c.hora}</span>
+          </div>
+          <div class="cita-doctor">👨‍⚕️ ${c.medico}</div>
+          <div class="cita-especialidad">${c.especialidad}</div>
+          ${c.motivo ? `<div class="cita-motivo">💬 ${c.motivo}</div>` : ''}
+          <div class="cita-footer">
+            <span class="badge badge-${c.estado}">${c.estado}</span>
+            ${c.estado!=='cancelada' ? `<button class="btn btn-danger btn-sm" onclick="cancelarCita('${c.id}')">Cancelar</button>` : ''}
+          </div>
+        </div>`).join('')}
+      </div>`;
     }
 
-    document.getElementById('btnNuevoMedico').addEventListener('click', () => document.getElementById('modalMedico').classList.add('open'));
-    document.getElementById('modalMedico').addEventListener('click', e => { if (e.target === document.getElementById('modalMedico')) document.getElementById('modalMedico').classList.remove('open'); });
+    async function cancelarCita(id) {
+      if (!confirm('¿Cancelar esta cita?')) return;
+      const res = await fetch(`/api/citas/${id}`, {method:'DELETE', headers});
+      if (res.ok) cargarCitas();
+    }
 
-    document.getElementById('btnGuardarMedico').addEventListener('click', async () => {
-      const nombre = document.getElementById('nombreMedico').value.trim();
-      const especialidad = document.getElementById('especialidad').value.trim();
-      const alerta = document.getElementById('alertaMedico');
-      const btn = document.getElementById('btnGuardarMedico');
-      if (!nombre || !especialidad) { alerta.textContent = 'Completa todos los campos'; alerta.className = 'alert alert-error show'; return; }
-      btn.innerHTML = '<span class="loader"></span> Guardando...'; btn.disabled = true;
-      const res = await fetch('/api/admin/medicos', { method: 'POST', headers, body: JSON.stringify({ nombre, especialidad }) });
+    // ── MODAL NUEVA CITA ──
+    const overlay = document.getElementById('modalOverlay');
+    let medicoSeleccionado = null;
+    let horaSeleccionada = null;
+
+    document.getElementById('btnNuevaCita').addEventListener('click', () => {
+      overlay.classList.add('open');
+      medicoSeleccionado = null; horaSeleccionada = null;
+      document.getElementById('grupoHorarios').style.display = 'none';
+      const manana = new Date(); manana.setDate(manana.getDate()+1);
+      document.getElementById('selectFecha').min = manana.toISOString().split('T')[0];
+      document.getElementById('selectFecha').value = '';
+      cargarMedicos();
+    });
+    document.getElementById('modalClose').addEventListener('click', () => overlay.classList.remove('open'));
+    overlay.addEventListener('click', e => { if(e.target===overlay) overlay.classList.remove('open'); });
+
+    async function cargarMedicos() {
+      const res = await fetch('/api/admin/medicos', {headers});
+      const medicos = await res.json();
+      const emojis = ['👨‍⚕️','👩‍⚕️','🧑‍⚕️','👨‍⚕️'];
+      document.getElementById('medicosGrid').innerHTML = medicos.map((m,i) => `
+        <div class="medico-card" onclick="seleccionarMedico('${m._id}', this)" data-id="${m._id}">
+          <div class="medico-avatar">${emojis[i%emojis.length]}</div>
+          <div>
+            <div class="medico-nombre">${m.nombre}</div>
+            <div class="medico-esp">${m.especialidad}</div>
+          </div>
+        </div>`).join('');
+    }
+
+    function seleccionarMedico(id, el) {
+      document.querySelectorAll('.medico-card').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+      medicoSeleccionado = id;
+      cargarHorarios();
+    }
+
+    async function cargarHorarios() {
+      const fecha = document.getElementById('selectFecha').value;
+      if (!medicoSeleccionado || !fecha) return;
+      const res = await fetch(`/api/citas/disponibilidad?medico_id=${medicoSeleccionado}&fecha=${fecha}`);
+      const data = await res.json();
+      horaSeleccionada = null;
+      const grid = document.getElementById('horariosGrid');
+      grid.innerHTML = data.disponibles.length
+        ? data.disponibles.map(h => `<button class="horario-btn" onclick="seleccionarHora('${h}',this)">${h}</button>`).join('')
+        : '<p style="font-size:0.85rem;color:var(--texto-mid)">Sin horarios disponibles para esta fecha.</p>';
+      document.getElementById('grupoHorarios').style.display = 'block';
+    }
+
+    function seleccionarHora(hora, el) {
+      document.querySelectorAll('.horario-btn').forEach(b => b.classList.remove('selected'));
+      el.classList.add('selected');
+      horaSeleccionada = hora;
+    }
+
+    document.getElementById('selectFecha').addEventListener('change', cargarHorarios);
+
+    function mostrarAlertaModal(msg, tipo='error') {
+      const a = document.getElementById('alertaModal');
+      a.textContent = msg; a.className = `alert alert-${tipo} show`;
+    }
+
+    document.getElementById('btnConfirmar').addEventListener('click', async () => {
+      const fecha = document.getElementById('selectFecha').value;
+      const motivo = document.getElementById('motivo').value.trim();
+      const btn = document.getElementById('btnConfirmar');
+      if (!medicoSeleccionado) return mostrarAlertaModal('Selecciona un médico');
+      if (!fecha) return mostrarAlertaModal('Selecciona una fecha');
+      if (!horaSeleccionada) return mostrarAlertaModal('Selecciona un horario');
+      btn.innerHTML='<span class="loader"></span> Agendando...'; btn.disabled=true;
+      const res = await fetch('/api/citas', {method:'POST', headers, body:JSON.stringify({medico_id:medicoSeleccionado, fecha, hora:horaSeleccionada, motivo})});
       const data = await res.json();
       if (res.ok) {
-        alerta.textContent = '¡Médico agregado! 🌿'; alerta.className = 'alert alert-success show';
-        document.getElementById('nombreMedico').value = ''; document.getElementById('especialidad').value = '';
-        setTimeout(() => { document.getElementById('modalMedico').classList.remove('open'); cargarEstadisticas(); }, 900);
-      } else { alerta.textContent = data.error || 'Error'; alerta.className = 'alert alert-error show'; }
-      btn.innerHTML = 'Guardar médico'; btn.disabled = false;
+        mostrarAlertaModal('¡Cita agendada! 🌿', 'success');
+        setTimeout(() => { overlay.classList.remove('open'); cargarCitas(); document.getElementById('motivo').value=''; }, 1000);
+      } else {
+        mostrarAlertaModal(data.error||'Error al agendar');
+      }
+      btn.innerHTML='Confirmar cita'; btn.disabled=false;
     });
 
-    cargarEstadisticas();
     cargarCitas();
   </script>
 </body>
-
 </html>
