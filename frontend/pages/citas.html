@@ -263,7 +263,7 @@
     async function cargarMedicos() {
       const res = await fetch('/api/admin/medicos', { headers });
       const medicos = await res.json();
-      const imagenPorDefecto = 'https://raw.githubusercontent.com/yulkatesp/GestorCitas/frontend/Img/MED.png';
+      const imagenPorDefecto = 'https://raw.githubusercontent.com/yulkatesp/GestorCitas/frontend/img/MED.png';
       document.getElementById('medicosGrid').innerHTML = medicos.map((m) => `
     <div class="medico-card" onclick="seleccionarMedico('${m._id}', this)" data-id="${m._id}">
       <div class="medico-avatar">
