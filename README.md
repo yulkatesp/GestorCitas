@@ -2,6 +2,10 @@
 
 Aplicación web fullstack para agendar y gestionar citas médicas en una clínica.
 
+## Despliegue (Railway)
+
+Puedes acceder a la aplicación ya desplegada desde el enlace: gestorcitas-production.up.railway.app
+
 ## Stack tecnológico
 
 | Capa | Tecnología |
