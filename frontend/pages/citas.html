@@ -228,7 +228,7 @@
           </div>
           <img style="width: 50px;" src="${c.foto_medico || 'https://raw.githubusercontent.com/yulkatesp/GestorCitas/main/frontend/img/DOC.png'}" alt="Dr. ${c.medico}" class="cita-avatar">
           <div class="cita-especialidad">${c.especialidad}</div>
-          ${c.motivo ? `<img style="width: 50px;" src="${c.foto_motivo || 'https://raw.githubusercontent.com/yulkatesp/GestorCitas/main/frontend/img/CIT.png'}" alt="Motivo" class="cita-motivo">` : ''}
+          ${c.motivo ? `<img style="width: 50px;" src="${c.foto_motivo || 'https://raw.githubusercontent.com/yulkatesp/GestorCitas/main/frontend/img/PEND.png'}" alt="Motivo" class="cita-motivo">` : ''}
           <div class="cita-footer">
             <span class="badge badge-${c.estado}">${c.estado}</span>
             ${c.estado !== 'cancelada' ? `<button class="btn btn-danger btn-sm" onclick="cancelarCita('${c.id}')">Cancelar</button>` : ''}
