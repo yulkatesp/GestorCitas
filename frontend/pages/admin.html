@@ -3,14 +3,24 @@
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Panel Admin — MediCita</title>
-   <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="/css/styles.css">
+  <style>
+    .btn-asistio  { background:#f0fdf4;color:#166534;border:1.5px solid #86efac;border-radius:100px;padding:0.35rem 0.85rem;font-size:0.8rem;font-weight:700;cursor:pointer;transition:all 0.15s;font-family:inherit; }
+    .btn-asistio:hover  { background:#dcfce7; }
+    .btn-no-asistio { background:#fef2f2;color:#991b1b;border:1.5px solid #fca5a5;border-radius:100px;padding:0.35rem 0.85rem;font-size:0.8rem;font-weight:700;cursor:pointer;transition:all 0.15s;font-family:inherit; }
+    .btn-no-asistio:hover { background:#fee2e2; }
+    .btn-perdonar { background:#fef9c3;color:#854d0e;border:1.5px solid #fde68a;border-radius:100px;padding:0.35rem 0.85rem;font-size:0.8rem;font-weight:700;cursor:pointer;transition:all 0.15s;font-family:inherit; }
+    .btn-perdonar:hover { background:#fef08a; }
+    .badge-no_asistio { background:#fee2e2;color:#991b1b; }
+    .multado-tag { background:#fef9c3;color:#854d0e;font-size:0.72rem;font-weight:700;padding:0.2rem 0.6rem;border-radius:100px;margin-left:0.4rem; }
+  </style>
 </head>
 <body>
   <div class="blob blob-1"></div>
   <div class="blob blob-2"></div>
 
   <nav>
-    <a href="index.html" class="nav-logo"><span class="cruz">✚</span> MediCita</a>
+    <a href="/" class="nav-logo"><span class="cruz">✚</span> MediCita</a>
     <div class="nav-links">
       <span style="font-size:0.78rem;background:var(--menta);color:var(--verde-dark);padding:0.3rem 1rem;border-radius:100px;font-weight:700">Admin</span>
       <button class="btn btn-outline btn-sm" id="btnLogout">Salir</button>
@@ -19,33 +29,30 @@
 
   <div class="dashboard">
     <div class="dashboard-header">
-      <div>
-        <h1>Panel Administrativo</h1>
-        <p>Gestión de citas y médicos de la clínica</p>
+      <div><h1>Panel Administrativo</h1><p>Gestión de citas y médicos de la clínica</p></div>
+      <div style="display:flex;gap:0.75rem">
+        <button class="btn btn-outline" id="btnMultados">🚫 Multas activas</button>
+        <button class="btn btn-dorado" id="btnNuevoMedico">+ Nuevo médico</button>
       </div>
-      <button class="btn btn-dorado" id="btnNuevoMedico">+ Nuevo médico</button>
     </div>
 
-    <div class="stats-row" id="statsRow">
-      <div class="stat-card"><img src="../img/CIT.png" alt="Total citas" class="stat-icon" style="width: 50px;"><div class="stat-num" id="statTotal">—</div><div class="stat-label">Total citas</div></div>
-      <div class="stat-card"><img src="../img/PEND.png" alt="Total citas" class="stat-icon" style="width: 50px;"><div class="stat-num" id="statPendientes">—</div><div class="stat-label">Pendientes</div></div>
-      <div class="stat-card"><img src="../img/PAC.png" alt="Total citas" class="stat-icon" style="width: 50px;"><div class="stat-num" id="statUsuarios">—</div><div class="stat-label">Pacientes</div></div>
-      <div class="stat-card"><img src="../img/DOC.png" alt="Total citas" class="stat-icon" style="width: 50px;"><div class="stat-num" id="statMedicos">—</div><div class="stat-label">Médicos</div></div>
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-icon">📋</div><div class="stat-num" id="statTotal">—</div><div class="stat-label">Total citas</div></div>
+      <div class="stat-card"><div class="stat-icon">⏳</div><div class="stat-num" id="statPendientes">—</div><div class="stat-label">Pendientes</div></div>
+      <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-num" id="statUsuarios">—</div><div class="stat-label">Pacientes</div></div>
+      <div class="stat-card"><div class="stat-icon">👨‍⚕️</div><div class="stat-num" id="statMedicos">—</div><div class="stat-label">Médicos</div></div>
+      <div class="stat-card"><div class="stat-icon">🚫</div><div class="stat-num" id="statMultados" style="color:#991b1b">—</div><div class="stat-label">Con multa</div></div>
     </div>
 
-    <!-- Layout: tabla + calendario -->
     <div class="citas-layout">
       <div class="table-wrap">
         <div class="table-header">
           <h2>Todas las citas</h2>
           <button class="btn btn-outline btn-sm" onclick="cargarCitas()">↻ Actualizar</button>
         </div>
-        <div id="tablaCitas">
-          <div style="text-align:center;padding:2.5rem"><span class="loader loader-dark"></span></div>
-        </div>
+        <div id="tablaCitas"><div style="text-align:center;padding:2.5rem"><span class="loader loader-dark"></span></div></div>
       </div>
 
-      <!-- Calendario admin -->
       <div>
         <div class="calendario-wrap fade-in">
           <div class="cal-header">
@@ -54,8 +61,7 @@
             <button class="cal-nav" id="calNext">›</button>
           </div>
           <div class="cal-dias-semana">
-            <span>Do</span><span>Lu</span><span>Ma</span>
-            <span>Mi</span><span>Ju</span><span>Vi</span><span>Sa</span>
+            <span>Do</span><span>Lu</span><span>Ma</span><span>Mi</span><span>Ju</span><span>Vi</span><span>Sa</span>
           </div>
           <div class="cal-dias" id="calDias"></div>
           <div class="cal-leyenda">
@@ -80,25 +86,36 @@
       </div>
       <div id="alertaMedico" class="alert"></div>
       <div class="form-group">
-        <label for="nombreMedico">Nombre completo</label>
+        <label>Nombre completo</label>
         <input type="text" id="nombreMedico" placeholder="Dr. Juan Pérez">
       </div>
       <div class="form-group">
-        <label for="especialidad">Especialidad</label>
+        <label>Especialidad</label>
         <input type="text" id="especialidad" placeholder="Ej: Cardiología">
       </div>
       <button class="btn btn-primary btn-full" id="btnGuardarMedico">Guardar médico</button>
     </div>
   </div>
 
+  <!-- Modal multas activas -->
+  <div class="modal-overlay" id="modalMultados">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>🚫 Multas activas</h2>
+        <button class="modal-close" onclick="document.getElementById('modalMultados').classList.remove('open')">✕</button>
+      </div>
+      <div id="listaMultados"><div style="text-align:center;padding:2rem"><span class="loader loader-dark"></span></div></div>
+    </div>
+  </div>
+
   <script>
     const token = localStorage.getItem('token');
-    const usuario = JSON.parse(localStorage.getItem('usuario')||'null');
-    if (!token||!usuario||usuario.rol!=='admin') window.location.href = '/login';
+    const usuario = JSON.parse(localStorage.getItem('usuario') || 'null');
+    if (!token || !usuario || usuario.rol !== 'admin') window.location.href = '/login';
 
     document.getElementById('btnLogout').addEventListener('click', () => { localStorage.clear(); window.location.href = '/login'; });
 
-    const headers = {'Content-Type':'application/json','Authorization':`Bearer ${token}`};
+    const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
     let todasCitasAdmin = [];
     let calFecha = new Date();
 
@@ -110,9 +127,9 @@
       const primerDia = new Date(año,mes,1).getDay();
       const diasEnMes = new Date(año,mes+1,0).getDate();
       const fechasCitas = todasCitasAdmin.filter(c=>c.estado!=='cancelada').map(c=>c.fecha);
-      let html='';
-      for(let i=0;i<primerDia;i++) html+='<button class="cal-dia vacio"></button>';
-      for(let d=1;d<=diasEnMes;d++){
+      let html = '';
+      for (let i=0;i<primerDia;i++) html+='<button class="cal-dia vacio"></button>';
+      for (let d=1;d<=diasEnMes;d++) {
         const fechaStr=`${año}-${String(mes+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
         const esHoy=hoy.getFullYear()===año&&hoy.getMonth()===mes&&hoy.getDate()===d;
         const tieneCita=fechasCitas.includes(fechaStr);
@@ -132,22 +149,16 @@
     }
 
     function renderCitasHoy() {
-      const hoy = new Date().toISOString().split('T')[0];
-      const citasHoy = todasCitasAdmin.filter(c=>c.fecha===hoy&&c.estado!=='cancelada');
+      const hoy=new Date().toISOString().split('T')[0];
+      const citasHoy=todasCitasAdmin.filter(c=>c.fecha===hoy&&c.estado!=='cancelada');
       const meses=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
       const wrap=document.getElementById('citasHoy');
       if(!citasHoy.length){wrap.innerHTML='<p style="font-size:0.82rem;color:var(--texto-light)">Sin citas hoy</p>';return;}
       wrap.innerHTML=citasHoy.map(c=>{
-        const [y,m,d]=c.fecha.split('-');
-        return `<div class="proxima-item">
-          <div class="proxima-fecha-box">
-            <div class="proxima-dia">${d}</div>
-            <div class="proxima-mes">${meses[+m-1]}</div>
-          </div>
-          <div class="proxima-info">
-            <div class="proxima-doctor">${c.paciente}</div>
-            <div class="proxima-hora">${c.hora} — ${c.medico}</div>
-          </div>
+        const[y,m,d]=c.fecha.split('-');
+        return`<div class="proxima-item">
+          <div class="proxima-fecha-box"><div class="proxima-dia">${d}</div><div class="proxima-mes">${meses[+m-1]}</div></div>
+          <div class="proxima-info"><div class="proxima-doctor">${c.paciente}</div><div class="proxima-hora">${c.hora} — ${c.medico}</div></div>
         </div>`;
       }).join('');
     }
@@ -162,6 +173,7 @@
       document.getElementById('statPendientes').textContent=data.citasPendientes;
       document.getElementById('statUsuarios').textContent=data.totalUsuarios;
       document.getElementById('statMedicos').textContent=data.totalMedicos;
+      document.getElementById('statMultados').textContent=data.totalMultados||0;
     }
 
     async function cargarCitas() {
@@ -174,7 +186,7 @@
         renderCitasAdmin(citas);
         renderCalendarioAdmin();
         renderCitasHoy();
-      } catch(e){
+      } catch(e) {
         wrap.innerHTML=`<div class="empty-state"><div class="empty-icon">⚠️</div><h3>Error al cargar</h3></div>`;
       }
     }
@@ -186,29 +198,96 @@
       return`${d} ${meses[+m-1]} ${y}`;
     }
 
+    function botonesAsistencia(c) {
+      if (c.estado === 'cancelada') return '—';
+      if (c.asistencia === true)  return '<span style="color:#166534;font-weight:700">✔ Asistió</span>';
+      if (c.asistencia === false) return '<span style="color:#991b1b;font-weight:700">✘ No asistió</span>';
+      // Solo mostrar botones si la cita ya pasó
+      const ahora = new Date();
+      const [anio,mes,dia] = c.fecha.split('-').map(Number);
+      const [h,min] = c.hora.split(':').map(Number);
+      const fechaCita = new Date(anio, mes-1, dia, h, min);
+      if (fechaCita > ahora) return '<span style="color:var(--texto-light);font-size:0.8rem">Próxima</span>';
+      return `<div style="display:flex;gap:0.4rem">
+        <button class="btn-asistio" onclick="registrarAsistencia('${c.id}', true)">✔ Asistió</button>
+        <button class="btn-no-asistio" onclick="registrarAsistencia('${c.id}', false)">✘ No asistió</button>
+      </div>`;
+    }
+
     function renderCitasAdmin(citas){
       const wrap=document.getElementById('tablaCitas');
       if(!citas.length){wrap.innerHTML='<div class="empty-state"><div class="empty-icon">🌿</div><h3>Sin citas</h3></div>';return;}
       wrap.innerHTML=`<table>
         <thead><tr>
-          <th>Paciente</th><th>Médico</th><th>Especialidad</th>
-          <th>Fecha</th><th>Hora</th><th>Estado</th><th>Motivo</th>
+          <th>Paciente</th><th>Médico</th><th>Fecha</th><th>Hora</th>
+          <th>Estado</th><th>Asistencia</th><th>Motivo</th>
         </tr></thead>
         <tbody>${citas.map(c=>`<tr>
-          <td><strong>${c.paciente}</strong><br><span style="font-size:0.78rem;color:var(--texto-light)">${c.paciente_email}</span></td>
-          <td>${c.medico}</td>
-          <td style="color:var(--texto-mid);font-size:0.85rem">${c.especialidad}</td>
+          <td>
+            <strong>${c.paciente}</strong>
+            ${c.multado ? '<span class="multado-tag">🚫 Multado</span>' : ''}
+            <br><span style="font-size:0.78rem;color:var(--texto-light)">${c.paciente_email}</span>
+          </td>
+          <td>${c.medico}<br><span style="font-size:0.8rem;color:var(--texto-mid)">${c.especialidad}</span></td>
           <td>${formatFecha(c.fecha)}</td>
           <td><strong>${c.hora}</strong></td>
-          <td><span class="badge badge-${c.estado}">${c.estado}</span></td>
+          <td><span class="badge badge-${c.estado.replace('_','')}">${c.estado.replace('_',' ')}</span></td>
+          <td>${botonesAsistencia(c)}</td>
           <td style="color:var(--texto-mid);font-size:0.85rem">${c.motivo||'—'}</td>
         </tr>`).join('')}</tbody>
       </table>`;
     }
 
+    async function registrarAsistencia(citaId, asistio) {
+      const msg = asistio ? '¿Confirmar que el paciente asistió?' : '¿Confirmar inasistencia? Se aplicará una multa al paciente.';
+      if (!confirm(msg)) return;
+      const res = await fetch(`/api/admin/citas/${citaId}/asistencia`, {
+        method: 'PATCH', headers,
+        body: JSON.stringify({ asistencia: asistio })
+      });
+      const data = await res.json();
+      if (res.ok) { cargarCitas(); cargarEstadisticas(); }
+      else alert(data.error);
+    }
+
+    // ── Multas ──
+    document.getElementById('btnMultados').addEventListener('click', async () => {
+      document.getElementById('modalMultados').classList.add('open');
+      const res = await fetch('/api/admin/pacientes-multados', { headers });
+      const pacientes = await res.json();
+      const wrap = document.getElementById('listaMultados');
+      if (!pacientes.length) {
+        wrap.innerHTML = '<p style="text-align:center;color:var(--texto-mid);padding:1.5rem">Sin multas activas 🎉</p>';
+        return;
+      }
+      wrap.innerHTML = pacientes.map(p => `
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:0.85rem 0;border-bottom:1px solid var(--crema-dark)">
+          <div>
+            <div style="font-weight:700">${p.nombre}</div>
+            <div style="font-size:0.82rem;color:var(--texto-mid)">${p.email}</div>
+          </div>
+          <button class="btn-perdonar" onclick="perdonarMulta('${p.id}', '${p.nombre}', this)">Perdonar multa</button>
+        </div>`).join('');
+    });
+    document.getElementById('modalMultados').addEventListener('click', e => {
+      if (e.target === document.getElementById('modalMultados')) document.getElementById('modalMultados').classList.remove('open');
+    });
+
+    async function perdonarMulta(pacienteId, nombre, btn) {
+      if (!confirm(`¿Perdonar la multa de ${nombre}?`)) return;
+      const res = await fetch(`/api/admin/usuarios/${pacienteId}/perdonar-multa`, { method: 'PATCH', headers });
+      const data = await res.json();
+      if (res.ok) {
+        btn.textContent = '✔ Perdonada';
+        btn.disabled = true;
+        cargarEstadisticas();
+        cargarCitas();
+      } else alert(data.error);
+    }
+
+    // ── Modal médico ──
     document.getElementById('btnNuevoMedico').addEventListener('click',()=>document.getElementById('modalMedico').classList.add('open'));
     document.getElementById('modalMedico').addEventListener('click',e=>{if(e.target===document.getElementById('modalMedico'))document.getElementById('modalMedico').classList.remove('open');});
-
     document.getElementById('btnGuardarMedico').addEventListener('click',async()=>{
       const nombre=document.getElementById('nombreMedico').value.trim();
       const especialidad=document.getElementById('especialidad').value.trim();

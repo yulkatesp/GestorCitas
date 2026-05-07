@@ -1,13 +1,28 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mis Citas — MediCita</title>
   <link rel="stylesheet" href="/css/styles.css">
+  <style>
+    .multa-banner {
+      background: #fef2f2; border: 2px solid #fca5a5; border-radius: 16px;
+      padding: 1.25rem 1.5rem; margin-bottom: 1.5rem;
+      display: flex; align-items: flex-start; gap: 1rem;
+    }
+    .multa-icon { font-size: 2rem; flex-shrink: 0; }
+    .multa-titulo { font-weight: 700; color: #991b1b; font-size: 1rem; margin-bottom: 0.25rem; }
+    .multa-texto { color: #b91c1c; font-size: 0.88rem; line-height: 1.5; }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none !important; }
+    .tooltip-wrap { position: relative; display: inline-block; }
+    .tooltip-wrap .tooltip-msg {
+      display: none; position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%);
+      background: #1a1a2e; color: white; font-size: 0.75rem; padding: 0.4rem 0.75rem;
+      border-radius: 8px; white-space: nowrap; z-index: 10;
+    }
+    .tooltip-wrap:hover .tooltip-msg { display: block; }
+  </style>
 </head>
-
 <body>
   <div class="blob blob-1"></div>
   <div class="blob blob-2"></div>
@@ -26,11 +41,22 @@
         <h1>Mis citas</h1>
         <p id="subtitulo">Gestiona y agenda tus consultas médicas</p>
       </div>
-      <button class="btn btn-primary" id="btnNuevaCita">+ Nueva cita</button>
+      <div class="tooltip-wrap" id="wrapNuevaCita">
+        <button class="btn btn-primary" id="btnNuevaCita">+ Nueva cita</button>
+        <span class="tooltip-msg" id="tooltipNueva"></span>
+      </div>
+    </div>
+
+    <!-- Banner multa -->
+    <div id="multaBanner" class="multa-banner" style="display:none">
+      <div class="multa-icon">🚫</div>
+      <div>
+        <div class="multa-titulo">Tienes una multa activa por inasistencia</div>
+        <div class="multa-texto">No puedes agendar nuevas citas hasta que un administrador levante la multa. Por favor comunícate con la clínica.</div>
+      </div>
     </div>
 
     <div class="citas-layout">
-      <!-- Columna izquierda: citas -->
       <div>
         <div id="contenidoCitas">
           <div style="text-align:center;padding:3rem">
@@ -39,8 +65,6 @@
           </div>
         </div>
       </div>
-
-      <!-- Columna derecha: calendario -->
       <div>
         <div class="calendario-wrap fade-in">
           <div class="cal-header">
@@ -54,15 +78,8 @@
           </div>
           <div class="cal-dias" id="calDias"></div>
           <div class="cal-leyenda">
-            <div class="cal-leyenda-item">
-              <div class="cal-dot" style="background:var(--dorado)"></div>Con cita
-            </div>
-            <div class="cal-leyenda-item">
-              <div class="cal-dot" style="background:var(--dorado-light)"></div>Hoy
-            </div>
-            <div class="cal-leyenda-item">
-              <div class="cal-dot" style="background:var(--verde)"></div>Seleccionado
-            </div>
+            <div class="cal-leyenda-item"><div class="cal-dot" style="background:var(--dorado)"></div>Con cita</div>
+            <div class="cal-leyenda-item"><div class="cal-dot" style="background:var(--dorado-light)"></div>Hoy</div>
           </div>
           <div class="proximas-wrap">
             <div class="proximas-titulo">Próximas citas</div>
@@ -81,7 +98,6 @@
         <button class="modal-close" id="modalClose">✕</button>
       </div>
       <div id="alertaModal" class="alert"></div>
-
       <div class="form-group">
         <label>Médico / Especialidad</label>
         <div id="medicosGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-top:0.4rem"></div>
@@ -95,8 +111,7 @@
         <div class="horarios-grid" id="horariosGrid"></div>
       </div>
       <div class="form-group">
-        <label for="motivo">Motivo de consulta <span
-            style="font-weight:400;text-transform:none;font-size:0.78rem">(opcional)</span></label>
+        <label for="motivo">Motivo <span style="font-weight:400;text-transform:none;font-size:0.78rem">(opcional)</span></label>
         <input type="text" id="motivo" placeholder="Ej: Dolor de cabeza, revisión general...">
       </div>
       <button class="btn btn-primary btn-full" id="btnConfirmar">Confirmar cita</button>
@@ -106,38 +121,45 @@
   <script>
     const token = localStorage.getItem('token');
     const usuario = JSON.parse(localStorage.getItem('usuario') || 'null');
-    if (!token || !usuario) window.location.href = '/login';
+    if (!token || !usuario) window.location.replace('/login');
 
-    document.getElementById('navNombre').textContent = `Hola, ${usuario.nombre.split(' ')[0]}`;
+    document.getElementById('navNombre').textContent = `Hola, ${usuario.nombre.split(' ')[0]} 👋`;
     document.getElementById('subtitulo').textContent = `Bienvenida, ${usuario.nombre}`;
     document.getElementById('btnLogout').addEventListener('click', () => { localStorage.clear(); window.location.href = '/login'; });
 
     const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
-
-    // ── CALENDARIO ──
     let calFecha = new Date();
     let todasCitas = [];
+    let estaMultado = false;
 
+    // ── Verificar multa ──
+    async function verificarMulta() {
+      const res = await fetch('/api/users/perfil', { headers });
+      const data = await res.json();
+      estaMultado = !!data.multado;
+      if (estaMultado) {
+        document.getElementById('multaBanner').style.display = 'flex';
+        document.getElementById('btnNuevaCita').disabled = true;
+        document.getElementById('tooltipNueva').textContent = 'Tienes una multa activa';
+      }
+    }
+
+    // ── Calendario ──
     function renderCalendario() {
       const año = calFecha.getFullYear(), mes = calFecha.getMonth();
-      const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+      const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
       document.getElementById('calTitulo').textContent = `${meses[mes]} ${año}`;
-
       const hoy = new Date();
       const primerDia = new Date(año, mes, 1).getDay();
       const diasEnMes = new Date(año, mes + 1, 0).getDate();
-
-      const fechasCitas = todasCitas
-        .filter(c => c.estado !== 'cancelada')
-        .map(c => c.fecha);
-
+      const fechasCitas = todasCitas.filter(c => c.estado !== 'cancelada').map(c => c.fecha);
       let html = '';
       for (let i = 0; i < primerDia; i++) html += '<button class="cal-dia vacio"></button>';
       for (let d = 1; d <= diasEnMes; d++) {
-        const fechaStr = `${año}-${String(mes + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-        const esHoy = hoy.getFullYear() === año && hoy.getMonth() === mes && hoy.getDate() === d;
+        const fechaStr = `${año}-${String(mes+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        const esHoy = hoy.getFullYear()===año && hoy.getMonth()===mes && hoy.getDate()===d;
         const tieneCita = fechasCitas.includes(fechaStr);
-        const pasado = new Date(año, mes, d) < new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+        const pasado = new Date(año,mes,d) < new Date(hoy.getFullYear(),hoy.getMonth(),hoy.getDate());
         let cls = 'cal-dia';
         if (esHoy) cls += ' hoy';
         if (tieneCita) cls += ' tiene-cita';
@@ -145,49 +167,35 @@
         html += `<button class="${cls}" data-fecha="${fechaStr}">${d}</button>`;
       }
       document.getElementById('calDias').innerHTML = html;
-
       document.querySelectorAll('.cal-dia:not(.vacio):not(.pasado)').forEach(btn => {
         btn.addEventListener('click', () => {
           document.querySelectorAll('.cal-dia').forEach(b => b.classList.remove('seleccionado'));
           btn.classList.add('seleccionado');
-          filtrarCitasPorFecha(btn.dataset.fecha);
+          const citasDia = todasCitas.filter(c => c.fecha === btn.dataset.fecha);
+          renderCitas(citasDia.length ? citasDia : todasCitas);
         });
       });
     }
 
-    function filtrarCitasPorFecha(fecha) {
-      const citasDia = todasCitas.filter(c => c.fecha === fecha);
-      if (citasDia.length) renderCitas(citasDia);
-      else renderCitas(todasCitas);
-    }
-
-    document.getElementById('calPrev').addEventListener('click', () => { calFecha.setMonth(calFecha.getMonth() - 1); renderCalendario(); });
-    document.getElementById('calNext').addEventListener('click', () => { calFecha.setMonth(calFecha.getMonth() + 1); renderCalendario(); });
+    document.getElementById('calPrev').addEventListener('click', () => { calFecha.setMonth(calFecha.getMonth()-1); renderCalendario(); });
+    document.getElementById('calNext').addEventListener('click', () => { calFecha.setMonth(calFecha.getMonth()+1); renderCalendario(); });
 
     function renderProximas(citas) {
-      const proximas = citas
-        .filter(c => c.estado === 'pendiente' && c.fecha >= new Date().toISOString().split('T')[0])
-        .sort((a, b) => a.fecha.localeCompare(b.fecha))
-        .slice(0, 3);
-      const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+      const hoyStr = new Date().toISOString().split('T')[0];
+      const proximas = citas.filter(c => c.estado === 'pendiente' && c.fecha >= hoyStr)
+        .sort((a,b) => a.fecha.localeCompare(b.fecha)).slice(0, 3);
+      const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
       const wrap = document.getElementById('proximasList');
       if (!proximas.length) { wrap.innerHTML = '<p style="font-size:0.82rem;color:var(--texto-light)">Sin citas próximas</p>'; return; }
       wrap.innerHTML = proximas.map(c => {
-        const [y, m, d] = c.fecha.split('-');
+        const [y,m,d] = c.fecha.split('-');
         return `<div class="proxima-item">
-          <div class="proxima-fecha-box">
-            <div class="proxima-dia">${d}</div>
-            <div class="proxima-mes">${meses[+m - 1]}</div>
-          </div>
-          <div class="proxima-info">
-            <div class="proxima-doctor">${c.medico}</div>
-            <div class="proxima-hora">${c.hora} — ${c.especialidad}</div>
-          </div>
+          <div class="proxima-fecha-box"><div class="proxima-dia">${d}</div><div class="proxima-mes">${meses[+m-1]}</div></div>
+          <div class="proxima-info"><div class="proxima-doctor">${c.medico}</div><div class="proxima-hora">${c.hora} — ${c.especialidad}</div></div>
         </div>`;
       }).join('');
     }
 
-    // ── CARGAR CITAS ──
     async function cargarCitas() {
       try {
         const res = await fetch('/api/citas', { headers });
@@ -197,61 +205,96 @@
         renderCitas(data);
         renderCalendario();
         renderProximas(data);
-      } catch (e) {
+      } catch(e) {
         document.getElementById('contenidoCitas').innerHTML =
           `<div class="empty-state"><div class="empty-icon">⚠️</div><h3>Error al cargar</h3><p>${e.message}</p></div>`;
       }
     }
 
     function formatFecha(f) {
-      const [y, m, d] = f.split('-');
-      const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-      return `${d} ${meses[+m - 1]} ${y}`;
+      const [y,m,d] = f.split('-');
+      const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+      return `${d} ${meses[+m-1]} ${y}`;
+    }
+
+    // Determinar si el botón cancelar debe estar deshabilitado
+    function puedeCancel(cita) {
+      if (cita.estado === 'cancelada' || cita.estado === 'completada' || cita.estado === 'no_asistio') return false;
+      const ahora = new Date();
+      const [anio, mes, dia] = cita.fecha.split('-').map(Number);
+      const [h, min] = cita.hora.split(':').map(Number);
+      const fechaCita = new Date(anio, mes - 1, dia, h, min);
+      const diffMin = (fechaCita - ahora) / 1000 / 60;
+      return diffMin >= 60;
+    }
+
+    function badgeAsistencia(cita) {
+      if (cita.asistencia === true)  return '<span class="badge badge-completada">✔ Asistió</span>';
+      if (cita.asistencia === false) return '<span class="badge badge-cancelada">✘ No asistió</span>';
+      return '';
     }
 
     function renderCitas(citas) {
       const wrap = document.getElementById('contenidoCitas');
       if (!citas.length) {
         wrap.innerHTML = `<div class="empty-state">
-          <div class="empty-icon"></div>
+          <div class="empty-icon">🌿</div>
           <h3>Sin citas agendadas</h3>
           <p>¡Agenda tu primera consulta médica!</p>
           <button class="btn btn-primary" style="margin-top:1rem" onclick="document.getElementById('btnNuevaCita').click()">+ Nueva cita</button>
         </div>`;
         return;
       }
-      wrap.innerHTML = `<div class="citas-grid">${citas.map(c => `
-        <div class="cita-card ${c.estado === 'cancelada' ? 'cancelada' : ''}">
+
+      wrap.innerHTML = `<div class="citas-grid">${citas.map(c => {
+        const cancelable = puedeCancel(c);
+        const tooltip = !cancelable && c.estado === 'pendiente'
+          ? 'No puedes cancelar con menos de 1 hora de anticipación' : '';
+
+        return `<div class="cita-card ${c.estado==='cancelada'||c.estado==='no_asistio'?'cancelada':''}">
           <div class="cita-top">
             <span class="cita-fecha-tag">${formatFecha(c.fecha)}</span>
             <span class="cita-hora">${c.hora}</span>
           </div>
-          <img style="width: 50px;" src="${c.foto_medico || 'https://raw.githubusercontent.com/yulkatesp/GestorCitas/main/frontend/img/DOC.png'}" alt="Dr. ${c.medico}" class="cita-avatar">
+          <div class="cita-doctor">🩺 ${c.medico}</div>
           <div class="cita-especialidad">${c.especialidad}</div>
-          ${c.motivo ? `<img style="width: 50px;" src="${c.foto_motivo || 'https://raw.githubusercontent.com/yulkatesp/GestorCitas/main/frontend/img/PEND.png'}" alt="Motivo" class="cita-motivo">` : ''}
+          ${c.motivo ? `<div class="cita-motivo">💬 ${c.motivo}</div>` : ''}
           <div class="cita-footer">
-            <span class="badge badge-${c.estado}">${c.estado}</span>
-            ${c.estado !== 'cancelada' ? `<button class="btn btn-danger btn-sm" onclick="cancelarCita('${c.id}')">Cancelar</button>` : ''}
+            <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap">
+              <span class="badge badge-${c.estado}">${c.estado.replace('_',' ')}</span>
+              ${badgeAsistencia(c)}
+            </div>
+            ${c.estado === 'pendiente' ? `
+              <div class="tooltip-wrap">
+                <button class="btn btn-danger btn-sm"
+                  ${!cancelable ? 'disabled' : ''}
+                  onclick="cancelarCita('${c.id}')">Cancelar</button>
+                ${tooltip ? `<span class="tooltip-msg">${tooltip}</span>` : ''}
+              </div>` : ''}
           </div>
-        </div>`).join('')}
-      </div>`;
+        </div>`;
+      }).join('')}</div>`;
     }
 
     async function cancelarCita(id) {
       if (!confirm('¿Cancelar esta cita?')) return;
       const res = await fetch(`/api/citas/${id}`, { method: 'DELETE', headers });
+      const data = await res.json();
       if (res.ok) cargarCitas();
+      else alert(data.error);
     }
 
-    // ── MODAL NUEVA CITA ──
+    // ── Modal nueva cita ──
     const overlay = document.getElementById('modalOverlay');
     let medicoSeleccionado = null;
     let horaSeleccionada = null;
 
     document.getElementById('btnNuevaCita').addEventListener('click', () => {
+      if (estaMultado) return;
       overlay.classList.add('open');
       medicoSeleccionado = null; horaSeleccionada = null;
       document.getElementById('grupoHorarios').style.display = 'none';
+      document.getElementById('alertaModal').className = 'alert';
       const manana = new Date(); manana.setDate(manana.getDate() + 1);
       document.getElementById('selectFecha').min = manana.toISOString().split('T')[0];
       document.getElementById('selectFecha').value = '';
@@ -264,20 +307,15 @@
       const res = await fetch('/api/admin/medicos', { headers });
       const medicos = await res.json();
       const imagenPorDefecto = 'https://raw.githubusercontent.com/yulkatesp/GestorCitas/main/frontend/img/MED.png';
-      document.getElementById('medicosGrid').innerHTML = medicos.map((m) => `
-    <div class="medico-card" onclick="seleccionarMedico('${m._id}', this)" data-id="${m._id}">
-      <div class="medico-avatar">
-        <img 
-          src="${m.foto || imagenPorDefecto}" 
-          alt="Dr. ${m.nombre}" 
-          style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;"
-        >
-      </div>
-      <div>
-        <div class="medico-nombre">${m.nombre}</div>
-        <div class="medico-esp">${m.especialidad}</div>
-      </div>
-    </div>`).join('');
+      document.getElementById('medicosGrid').innerHTML = medicos.map(m => `
+        <div class="medico-card" onclick="seleccionarMedico('${m._id}', this)" data-id="${m._id}">
+          <div class="medico-avatar">
+            <img src="${m.foto || imagenPorDefecto}" alt="${m.nombre}"
+              style="width:100%;height:100%;border-radius:50%;object-fit:cover"
+              onerror="this.parentElement.textContent='👨‍⚕️'">
+          </div>
+          <div><div class="medico-nombre">${m.nombre}</div><div class="medico-esp">${m.especialidad}</div></div>
+        </div>`).join('');
     }
 
     function seleccionarMedico(id, el) {
@@ -296,7 +334,7 @@
       const grid = document.getElementById('horariosGrid');
       grid.innerHTML = data.disponibles.length
         ? data.disponibles.map(h => `<button class="horario-btn" onclick="seleccionarHora('${h}',this)">${h}</button>`).join('')
-        : '<p style="font-size:0.85rem;color:var(--texto-mid)">Sin horarios disponibles para esta fecha.</p>';
+        : '<p style="font-size:0.85rem;color:var(--texto-mid)">Sin horarios disponibles.</p>';
       document.getElementById('grupoHorarios').style.display = 'block';
     }
 
@@ -321,19 +359,28 @@
       if (!fecha) return mostrarAlertaModal('Selecciona una fecha');
       if (!horaSeleccionada) return mostrarAlertaModal('Selecciona un horario');
       btn.innerHTML = '<span class="loader"></span> Agendando...'; btn.disabled = true;
-      const res = await fetch('/api/citas', { method: 'POST', headers, body: JSON.stringify({ medico_id: medicoSeleccionado, fecha, hora: horaSeleccionada, motivo }) });
+      const res = await fetch('/api/citas', {
+        method: 'POST', headers,
+        body: JSON.stringify({ medico_id: medicoSeleccionado, fecha, hora: horaSeleccionada, motivo })
+      });
       const data = await res.json();
       if (res.ok) {
-        mostrarAlertaModal('¡Cita agendada!', 'success');
+        mostrarAlertaModal('¡Cita agendada! 🌿', 'success');
         setTimeout(() => { overlay.classList.remove('open'); cargarCitas(); document.getElementById('motivo').value = ''; }, 1000);
       } else {
         mostrarAlertaModal(data.error || 'Error al agendar');
+        if (data.multado) {
+          overlay.classList.remove('open');
+          document.getElementById('multaBanner').style.display = 'flex';
+          document.getElementById('btnNuevaCita').disabled = true;
+          estaMultado = true;
+        }
       }
       btn.innerHTML = 'Confirmar cita'; btn.disabled = false;
     });
 
+    verificarMulta();
     cargarCitas();
   </script>
 </body>
-
 </html>
