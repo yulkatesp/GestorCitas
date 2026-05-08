@@ -1,22 +1,31 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Iniciar sesión — MediCita</title>
-  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="/css/styles.css">
 </head>
+
 <body>
   <nav>
-    <a href="index.html" class="nav-logo"><span class="cruz">✚</span> MediCita</a>
+    <a href="/" class="nav-logo"><span class="cruz">✚</span> MediCita</a>
   </nav>
   <div class="auth-wrapper">
     <div class="auth-left">
       <h2>Bienvenido de nuevo</h2>
       <p>Accede a tu cuenta para gestionar tus citas médicas de forma rápida y segura.</p>
       <div class="auth-steps">
-        <div class="auth-step"><div class="step-num">1</div><span>Inicia sesión con tu email</span></div>
-        <div class="auth-step"><div class="step-num">2</div><span>Consulta o agenda citas</span></div>
-        <div class="auth-step"><div class="step-num">3</div><span>Recibe atención sin filas</span></div>
+        <div class="auth-step">
+          <div class="step-num">1</div><span>Inicia sesión con tu email</span>
+        </div>
+        <div class="auth-step">
+          <div class="step-num">2</div><span>Consulta o agenda citas</span>
+        </div>
+        <div class="auth-step">
+          <div class="step-num">3</div><span>Recibe atención sin filas</span>
+        </div>
       </div>
     </div>
     <div class="auth-right">
@@ -33,16 +42,13 @@
           <input type="password" id="password" placeholder="••••••••">
         </div>
         <button class="btn btn-primary btn-full" id="btnLogin">Iniciar sesión</button>
-        <div class="auth-footer">¿No tienes cuenta? <a href="register.html">Regístrate gratis</a></div>
+        <div class="auth-footer">¿No tienes cuenta? <a href="/register">Regístrate gratis</a></div>
       </div>
     </div>
   </div>
   <script>
-    if (localStorage.getItem('token')) {
-      const rol = JSON.parse(localStorage.getItem('usuario')||'{}').rol;
-      window.location.href = rol === 'admin' ? 'admin.html' : 'citas.html';
-    }
-    function mostrarAlerta(msg, tipo='error') {
+    localStorage.clear();
+    function mostrarAlerta(msg, tipo = 'error') {
       const a = document.getElementById('alerta');
       a.textContent = msg; a.className = `alert alert-${tipo} show`;
     }
@@ -53,16 +59,19 @@
       if (!email || !password) return mostrarAlerta('Completa todos los campos');
       btn.innerHTML = '<span class="loader"></span> Entrando...'; btn.disabled = true;
       try {
-        const res = await fetch('/api/users/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email, password}) });
+        const res = await fetch('/api/users/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
         const data = await res.json();
-        if (!res.ok) { mostrarAlerta(data.error||'Error al iniciar sesión'); btn.innerHTML='Iniciar sesión'; btn.disabled=false; return; }
+        if (!res.ok) { mostrarAlerta(data.error || 'Error al iniciar sesión'); btn.innerHTML = 'Iniciar sesión'; btn.disabled = false; return; }
         localStorage.setItem('token', data.token);
         localStorage.setItem('usuario', JSON.stringify(data.usuario));
         mostrarAlerta('¡Bienvenido! Redirigiendo...', 'success');
-        setTimeout(() => window.location.href = data.usuario.rol==='admin' ? 'admin.html' : 'citas.html', 800);
-      } catch(e) { mostrarAlerta('Error de conexión'); btn.innerHTML='Iniciar sesión'; btn.disabled=false; }
+        setTimeout(() => {
+          window.location.replace(data.usuario.rol === 'admin' ? '/admin' : '/citas');
+        }, 800);
+      } catch (e) { mostrarAlerta('Error de conexión'); btn.innerHTML = 'Iniciar sesión'; btn.disabled = false; }
     });
-    document.getElementById('password').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('btnLogin').click(); });
+    document.getElementById('password').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('btnLogin').click(); });
   </script>
 </body>
+
 </html>

@@ -2,8 +2,12 @@ const jwt = require('jsonwebtoken');
 
 function verificarToken(req, res, next) {
   const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-  if (!token) return res.status(401).json({ error: 'Acceso denegado: token requerido' });
+  const token = authHeader && authHeader.split(' ')[1]; // "Bearer TOKEN"
+
+  if (!token) {
+    return res.status(401).json({ error: 'Acceso denegado: token requerido' });
+  }
+
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secreto_dev');
     req.usuario = decoded;
@@ -14,15 +18,10 @@ function verificarToken(req, res, next) {
 }
 
 function soloAdmin(req, res, next) {
-  if (req.usuario.rol !== 'admin')
+  if (req.usuario.rol !== 'admin') {
     return res.status(403).json({ error: 'Acceso restringido a administradores' });
+  }
   next();
 }
 
-function soloDoctor(req, res, next) {
-  if (req.usuario.rol !== 'doctor' && req.usuario.rol !== 'admin')
-    return res.status(403).json({ error: 'Acceso restringido a doctores' });
-  next();
-}
-
-module.exports = { verificarToken, soloAdmin, soloDoctor };
+module.exports = { verificarToken, soloAdmin };
