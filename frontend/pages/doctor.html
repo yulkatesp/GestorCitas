@@ -161,8 +161,8 @@
               : '<span class="badge badge-no_asistio">No asistió</span>';
           } else {
             acciones = `
-              <button class="btn-asistio" onclick="marcarAsistencia('${c.id}', true, this)">✔ Asistió</button>
-              <button class="btn-no-asistio" onclick="marcarAsistencia('${c.id}', false, this)">✘ No asistió</button>`;
+              <button class="btn-asistio" onclick="marcarAsistencia('${c.id}', true, this)">Asistió</button>
+              <button class="btn-no-asistio" onclick="marcarAsistencia('${c.id}', false, this)">No asistió</button>`;
           }
 
           return `<div class="${claseCard}" id="turno-${c.id}">

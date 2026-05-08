@@ -209,8 +209,8 @@
       const fechaCita = new Date(anio, mes-1, dia, h, min);
       if (fechaCita > ahora) return '<span style="color:var(--texto-light);font-size:0.8rem">Próxima</span>';
       return `<div style="display:flex;gap:0.4rem">
-        <button class="btn-asistio" onclick="registrarAsistencia('${c.id}', true)">✔ Asistió</button>
-        <button class="btn-no-asistio" onclick="registrarAsistencia('${c.id}', false)">✘ No asistió</button>
+        <button class="btn-asistio" onclick="registrarAsistencia('${c.id}', true)">Asistió</button>
+        <button class="btn-no-asistio" onclick="registrarAsistencia('${c.id}', false)">No asistió</button>
       </div>`;
     }
 
@@ -257,7 +257,7 @@
       const pacientes = await res.json();
       const wrap = document.getElementById('listaMultados');
       if (!pacientes.length) {
-        wrap.innerHTML = '<p style="text-align:center;color:var(--texto-mid);padding:1.5rem">Sin multas activas 🎉</p>';
+        wrap.innerHTML = '<p style="text-align:center;color:var(--texto-mid);padding:1.5rem">Sin multas activas</p>';
         return;
       }
       wrap.innerHTML = pacientes.map(p => `
