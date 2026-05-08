@@ -4,7 +4,12 @@ const {
   todasLasCitas, citasDelDoctor, listarMedicos, crearMedico, estadisticas,
   registrarAsistencia, perdonarMulta, pacientesMultados
 } = require('../controllers/adminController');
-const { verificarToken, soloAdmin, soloDoctor } = require('../middleware/auth');
+const {
+  verificarToken,
+  soloAdmin,
+  soloDoctor,
+  adminODoctor
+} = require('../middleware/auth');
 
 // Pública para cualquier usuario autenticado
 router.get('/medicos', verificarToken, listarMedicos);
