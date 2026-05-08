@@ -31,17 +31,17 @@
     <div class="dashboard-header">
       <div><h1>Panel Administrativo</h1><p>Gestión de citas y médicos de la clínica</p></div>
       <div style="display:flex;gap:0.75rem">
-        <button class="btn btn-outline" id="btnMultados">🚫 Multas activas</button>
+        <button class="btn btn-outline" id="btnMultados">Multas activas</button>
         <button class="btn btn-dorado" id="btnNuevoMedico">+ Nuevo médico</button>
       </div>
     </div>
 
     <div class="stats-row">
-      <div class="stat-card"><div class="stat-icon">📋</div><div class="stat-num" id="statTotal">—</div><div class="stat-label">Total citas</div></div>
-      <div class="stat-card"><div class="stat-icon">⏳</div><div class="stat-num" id="statPendientes">—</div><div class="stat-label">Pendientes</div></div>
-      <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-num" id="statUsuarios">—</div><div class="stat-label">Pacientes</div></div>
-      <div class="stat-card"><div class="stat-icon">👨‍⚕️</div><div class="stat-num" id="statMedicos">—</div><div class="stat-label">Médicos</div></div>
-      <div class="stat-card"><div class="stat-icon">🚫</div><div class="stat-num" id="statMultados" style="color:#991b1b">—</div><div class="stat-label">Con multa</div></div>
+      <div class="stat-card"><img src="https://github.com/yulkatesp/GestorCitas/tree/main/frontend/img/CIT.png" alt="Total citas" class="stat-icon"><div class="stat-num" id="statTotal">—</div><div class="stat-label">Total citas</div></div>
+      <div class="stat-card"><img src="https://github.com/yulkatesp/GestorCitas/tree/main/frontend/img/PEND.png" alt="Pendientes" class="stat-icon"><div class="stat-num" id="statPendientes">—</div><div class="stat-label">Pendientes</div></div>
+      <div class="stat-card"><img src="https://github.com/yulkatesp/GestorCitas/tree/main/frontend/img/USU.png" alt="Pacientes" class="stat-icon"><div class="stat-num" id="statUsuarios">—</div><div class="stat-label">Pacientes</div></div>
+      <div class="stat-card"><img src="https://github.com/yulkatesp/GestorCitas/tree/main/frontend/img/MED.png" alt="Médicos" class="stat-icon"><div class="stat-num" id="statMedicos">—</div><div class="stat-label">Médicos</div></div>
+      <div class="stat-card"><img src="https://github.com/yulkatesp/GestorCitas/tree/main/frontend/img/MULT.png" alt="Con multa" class="stat-icon"><div class="stat-num" id="statMultados" style="color:#991b1b">—</div><div class="stat-label">Con multa</div></div>
     </div>
 
     <div class="citas-layout">
@@ -101,7 +101,7 @@
   <div class="modal-overlay" id="modalMultados">
     <div class="modal">
       <div class="modal-header">
-        <h2>🚫 Multas activas</h2>
+        <h2>Multas activas</h2>
         <button class="modal-close" onclick="document.getElementById('modalMultados').classList.remove('open')">✕</button>
       </div>
       <div id="listaMultados"><div style="text-align:center;padding:2rem"><span class="loader loader-dark"></span></div></div>
@@ -216,7 +216,7 @@
 
     function renderCitasAdmin(citas){
       const wrap=document.getElementById('tablaCitas');
-      if(!citas.length){wrap.innerHTML='<div class="empty-state"><div class="empty-icon">🌿</div><h3>Sin citas</h3></div>';return;}
+      if(!citas.length){wrap.innerHTML='<div class="empty-state"><h3>Sin citas</h3></div>';return;}
       wrap.innerHTML=`<table>
         <thead><tr>
           <th>Paciente</th><th>Médico</th><th>Fecha</th><th>Hora</th>
@@ -225,7 +225,7 @@
         <tbody>${citas.map(c=>`<tr>
           <td>
             <strong>${c.paciente}</strong>
-            ${c.multado ? '<span class="multado-tag">🚫 Multado</span>' : ''}
+            ${c.multado ? '<span class="multado-tag">Multado</span>' : ''}
             <br><span style="font-size:0.78rem;color:var(--texto-light)">${c.paciente_email}</span>
           </td>
           <td>${c.medico}<br><span style="font-size:0.8rem;color:var(--texto-mid)">${c.especialidad}</span></td>
@@ -278,7 +278,7 @@
       const res = await fetch(`/api/admin/usuarios/${pacienteId}/perdonar-multa`, { method: 'PATCH', headers });
       const data = await res.json();
       if (res.ok) {
-        btn.textContent = '✔ Perdonada';
+        btn.textContent = 'Perdonada';
         btn.disabled = true;
         cargarEstadisticas();
         cargarCitas();
@@ -298,7 +298,7 @@
       const res=await fetch('/api/admin/medicos',{method:'POST',headers,body:JSON.stringify({nombre,especialidad})});
       const data=await res.json();
       if(res.ok){
-        alerta.textContent='¡Médico agregado! 🌿';alerta.className='alert alert-success show';
+        alerta.textContent='¡Médico agregado!';alerta.className='alert alert-success show';
         document.getElementById('nombreMedico').value='';document.getElementById('especialidad').value='';
         setTimeout(()=>{document.getElementById('modalMedico').classList.remove('open');cargarEstadisticas();},900);
       } else {alerta.textContent=data.error||'Error';alerta.className='alert alert-error show';}
