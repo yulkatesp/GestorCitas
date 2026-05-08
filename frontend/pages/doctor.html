@@ -117,7 +117,7 @@
         const data = await res.json();
 
         if (data.error) {
-          wrap.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><h3>${data.error}</h3><p>Contacta al administrador para vincular tu perfil médico.</p></div>`;
+          wrap.innerHTML = `<div class="empty-state"><h3>${data.error}</h3><p>Contacta al administrador para vincular tu perfil médico.</p></div>`;
           return;
         }
 
@@ -157,8 +157,8 @@
           let acciones = '';
           if (yaRegistrado) {
             acciones = c.asistencia
-              ? '<span class="badge badge-completada">✔ Asistió</span>'
-              : '<span class="badge badge-no_asistio">✘ No asistió</span>';
+              ? '<span class="badge badge-completada">Asistió</span>'
+              : '<span class="badge badge-no_asistio">No asistió</span>';
           } else {
             acciones = `
               <button class="btn-asistio" onclick="marcarAsistencia('${c.id}', true, this)">✔ Asistió</button>
@@ -179,7 +179,7 @@
         }).join('');
 
       } catch(e) {
-        wrap.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><h3>Error al cargar</h3><p>${e.message}</p></div>`;
+        wrap.innerHTML = `<div class="empty-state"><div class="empty-icon"></div><h3>Error al cargar</h3><p>${e.message}</p></div>`;
       }
     }
 
