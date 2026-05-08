@@ -24,4 +24,23 @@ function soloAdmin(req, res, next) {
   next();
 }
 
-module.exports = { verificarToken, soloAdmin };
+function soloDoctor(req, res, next) {
+  if (req.usuario.rol !== 'doctor') {
+    return res.status(403).json({ error: 'Acceso restringido a doctores' });
+  }
+  next();
+}
+
+function adminODoctor(req, res, next) {
+  if (req.usuario.rol !== 'admin' && req.usuario.rol !== 'doctor') {
+    return res.status(403).json({ error: 'Acceso denegado' });
+  }
+  next();
+}
+
+module.exports = {
+  verificarToken,
+  soloAdmin,
+  soloDoctor,
+  adminODoctor
+};

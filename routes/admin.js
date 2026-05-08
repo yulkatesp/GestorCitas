@@ -10,7 +10,12 @@ const { verificarToken, soloAdmin, soloDoctor } = require('../middleware/auth');
 router.get('/medicos', verificarToken, listarMedicos);
 
 // Doctor Y admin pueden registrar asistencia y ver sus citas
-router.patch('/citas/:id/asistencia',  verificarToken, soloDoctor, registrarAsistencia);
+router.patch(
+  '/citas/:id/asistencia',
+  verificarToken,
+  adminODoctor,
+  registrarAsistencia
+);
 router.get('/citas/doctor',            verificarToken, soloDoctor, citasDelDoctor);
 
 // Solo admin
