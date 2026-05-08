@@ -49,7 +49,7 @@
 
     <!-- Banner multa -->
     <div id="multaBanner" class="multa-banner" style="display:none">
-      <div class="multa-icon">🚫</div>
+      <img style="width: 50px;" src="https://raw.githubusercontent.com/yulkatesp/GestorCitas/main/frontend/img/MUL.png" alt="Con multa" class="stat-icon">
       <div>
         <div class="multa-titulo">Tienes una multa activa por inasistencia</div>
         <div class="multa-texto">No puedes agendar nuevas citas hasta que un administrador levante la multa. Por favor comunícate con la clínica.</div>
@@ -123,7 +123,7 @@
     const usuario = JSON.parse(localStorage.getItem('usuario') || 'null');
     if (!token || !usuario) window.location.replace('/login');
 
-    document.getElementById('navNombre').textContent = `Hola, ${usuario.nombre.split(' ')[0]} 👋`;
+    document.getElementById('navNombre').textContent = `Hola, ${usuario.nombre.split(' ')[0]}`;
     document.getElementById('subtitulo').textContent = `Bienvenida, ${usuario.nombre}`;
     document.getElementById('btnLogout').addEventListener('click', () => { localStorage.clear(); window.location.href = '/login'; });
 
@@ -238,7 +238,7 @@
       const wrap = document.getElementById('contenidoCitas');
       if (!citas.length) {
         wrap.innerHTML = `<div class="empty-state">
-          <div class="empty-icon">🌿</div>
+          <div class="empty-icon"></div>
           <h3>Sin citas agendadas</h3>
           <p>¡Agenda tu primera consulta médica!</p>
           <button class="btn btn-primary" style="margin-top:1rem" onclick="document.getElementById('btnNuevaCita').click()">+ Nueva cita</button>
@@ -258,7 +258,7 @@
           </div>
           <div class="cita-doctor">🩺 ${c.medico}</div>
           <div class="cita-especialidad">${c.especialidad}</div>
-          ${c.motivo ? `<div class="cita-motivo">💬 ${c.motivo}</div>` : ''}
+          ${c.motivo ? `<div class="cita-motivo">${c.motivo}</div>` : ''}
           <div class="cita-footer">
             <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap">
               <span class="badge badge-${c.estado}">${c.estado.replace('_',' ')}</span>
@@ -365,7 +365,7 @@
       });
       const data = await res.json();
       if (res.ok) {
-        mostrarAlertaModal('¡Cita agendada! 🌿', 'success');
+        mostrarAlertaModal('¡Cita agendada!', 'success');
         setTimeout(() => { overlay.classList.remove('open'); cargarCitas(); document.getElementById('motivo').value = ''; }, 1000);
       } else {
         mostrarAlertaModal(data.error || 'Error al agendar');
