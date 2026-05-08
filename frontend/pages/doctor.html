@@ -58,9 +58,9 @@
     <!-- Resumen del día -->
     <div class="resumen-dia">
       <div class="stat-card"><img style="width: 50px;" src="https://raw.githubusercontent.com/yulkatesp/GestorCitas/main/frontend/img/CIT.png" alt="Total citas" class="stat-icon"><div class="stat-num" id="statTotal">—</div><div class="stat-label">Total hoy</div></div>
-      <div class="stat-card"><img style="width: 50px;" src="https://raw.githubusercontent.com/yulkatesp/GestorCitas/main/frontend/img/PEN.png" alt="Pendientes" class="stat-icon"><div class="stat-num" id="statPendientes">—</div><div class="stat-label">Pendientes</div></div>
-      <div class="stat-card"><img style="width: 50px;" src="https://raw.githubusercontent.com/yulkatesp/GestorCitas/main/frontend/img/SI.png" alt="Asistieron" class="stat-icon"><div class="stat-num" id="statAsistieron" style="color:var(--verde)">—</div><div class="stat-label">Asistieron</div></div>
-      <div class="stat-card"><img style="width: 50px;" src="https://raw.githubusercontent.com/yulkatesp/GestorCitas/main/frontend/img/NO.png" alt="No asistieron" class="stat-icon"><div class="stat-num" id="statNoAsistieron" style="color:#991b1b">—</div><div class="stat-label">No asistieron</div></div>
+      <div class="stat-card"><img style="width: 50px;" src="https://raw.githubusercontent.com/yulkatesp/GestorCitas/main/frontend/img/PENd.png" alt="Pendientes" class="stat-icon"><div class="stat-num" id="statPendientes">—</div><div class="stat-label">Pendientes</div></div>
+      <div class="stat-card"><img style="width: 60px;" src="https://raw.githubusercontent.com/yulkatesp/GestorCitas/main/frontend/img/SI.png" alt="Asistieron" class="stat-icon"><div class="stat-num" id="statAsistieron" style="color:var(--verde)">—</div><div class="stat-label">Asistieron</div></div>
+      <div class="stat-card"><img style="width: 60px;" src="https://raw.githubusercontent.com/yulkatesp/GestorCitas/main/frontend/img/NO.png" alt="No asistieron" class="stat-icon"><div class="stat-num" id="statNoAsistieron" style="color:#991b1b">—</div><div class="stat-label">No asistieron</div></div>
     </div>
 
     <!-- Filtro por fecha -->
@@ -141,7 +141,7 @@
 
         if (!citas.length) {
           wrap.innerHTML = `<div class="empty-state">
-            <img style="width: 50px;" src="https://raw.githubusercontent.com/yulkatesp/GestorCitas/main/frontend/img/CAL.png" alt="Calendario" class="stat-icon">
+            <img style="width: 100px;" src="https://raw.githubusercontent.com/yulkatesp/GestorCitas/main/frontend/img/CAL.png" alt="Calendario" class="stat-icon">
             <h3>Sin citas para ${formatFecha(fechaFiltro)}</h3>
             <p>No tienes pacientes programados para este día.</p>
           </div>`;
