@@ -6,6 +6,49 @@ const path    = require('path');
 
 const app = express();
 
+const bcrypt = require('bcryptjs');
+const db = require('./database');
+
+setTimeout(() => {
+  db.medicos.findOne({ nombre: 'Dr. Carlos Gomez' }, (err, medico) => {
+    if (!medico) {
+      console.log('⚠️ Médico no encontrado para crear doctor');
+      return;
+    }
+
+    db.usuarios.findOne({ email: 'doctor@clinica.com' }, (err, existe) => {
+      if (existe) {
+        console.log('⚠️ Doctor ya existe');
+        return;
+      }
+
+      const hash = bcrypt.hashSync('doctor123', 10);
+
+      db.usuarios.insert({
+        nombre: 'Dr. Carlos Gomez',
+        email: 'doctor@clinica.com',
+        password: hash,
+        rol: 'doctor',
+        creado_en: new Date()
+      }, (err, doc) => {
+        if (err) {
+          console.log('❌ Error creando doctor:', err);
+          return;
+        }
+
+        db.medicos.update(
+          { _id: medico._id },
+          { $set: { usuario_id: doc._id } },
+          {},
+          () => {
+            console.log('✅ Doctor creado automáticamente');
+          }
+        );
+      });
+    });
+  });
+}, 1000);
+
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors());
 app.use(express.json());
