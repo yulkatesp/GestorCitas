@@ -26,7 +26,9 @@ app.get('/login',    (req, res) => res.sendFile(path.resolve('frontend/pages/log
 app.get('/register', (req, res) => res.sendFile(path.resolve('frontend/pages/register.html')));
 app.get('/citas',    (req, res) => res.sendFile(path.resolve('frontend/pages/citas.html')));
 app.get('/admin',    (req, res) => res.sendFile(path.resolve('frontend/pages/admin.html')));
+app.get('/doctor', (req, res) => res.sendFile(path.resolve('frontend/pages/doctor.html')));
 app.get('/',         (req, res) => res.sendFile(path.resolve('frontend/pages/index.html')));
+
 
 
 
