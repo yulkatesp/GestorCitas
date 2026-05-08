@@ -58,7 +58,7 @@
     <!-- Resumen del día -->
     <div class="resumen-dia">
       <div class="stat-card"><img style="width: 50px;" src="https://raw.githubusercontent.com/yulkatesp/GestorCitas/main/frontend/img/CIT.png" alt="Total citas" class="stat-icon"><div class="stat-num" id="statTotal">—</div><div class="stat-label">Total hoy</div></div>
-      <div class="stat-card"><img style="width: 50px;" src="https://raw.githubusercontent.com/yulkatesp/GestorCitas/main/frontend/img/PENd.png" alt="Pendientes" class="stat-icon"><div class="stat-num" id="statPendientes">—</div><div class="stat-label">Pendientes</div></div>
+      <div class="stat-card"><img style="width: 50px;" src="https://raw.githubusercontent.com/yulkatesp/GestorCitas/main/frontend/img/PEND.png" alt="Pendientes" class="stat-icon"><div class="stat-num" id="statPendientes">—</div><div class="stat-label">Pendientes</div></div>
       <div class="stat-card"><img style="width: 60px;" src="https://raw.githubusercontent.com/yulkatesp/GestorCitas/main/frontend/img/SI.png" alt="Asistieron" class="stat-icon"><div class="stat-num" id="statAsistieron" style="color:var(--verde)">—</div><div class="stat-label">Asistieron</div></div>
       <div class="stat-card"><img style="width: 60px;" src="https://raw.githubusercontent.com/yulkatesp/GestorCitas/main/frontend/img/NO.png" alt="No asistieron" class="stat-icon"><div class="stat-num" id="statNoAsistieron" style="color:#991b1b">—</div><div class="stat-label">No asistieron</div></div>
     </div>
@@ -169,7 +169,7 @@
             <div style="display:flex;align-items:center;gap:1.25rem;flex:1">
               <div class="turno-hora">${c.hora}</div>
               <div>
-                <div class="turno-paciente">👤 ${c.paciente}</div>
+                <div class="turno-paciente"><img style="width: 50px;" src="https://raw.githubusercontent.com/yulkatesp/GestorCitas/main/frontend/img/PAC.png" alt="Paciente" class="stat-icon"> ${c.paciente}</div>
                 <div class="turno-motivo">${c.motivo || 'Sin motivo especificado'}</div>
                 <div style="font-size:0.78rem;color:var(--texto-light);margin-top:0.1rem">${c.paciente_email}</div>
               </div>
@@ -204,7 +204,7 @@
       } else {
         alert(data.error || 'Error al registrar');
         btn.disabled = false;
-        btn.textContent = asistio ? '✔ Asistió' : '✘ No asistió';
+        btn.textContent = asistio ? 'Asistió' : 'No asistió';
       }
     }
 
